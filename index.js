@@ -104,6 +104,51 @@ app.get('/users/:id/profile', (req, res) => {
         }
     })
 })
+
+//update some data(columns not all ) of user then use patch method  (if all columns we use put method)
+app.patch('/users/:id/profile', (req, res) => {
+    const {id} = req.params; 
+    const fields = [];
+    const values = [];
+
+    if (req.body.firstName !== undefined) {
+        fields.push('u_FirstName = ?');
+        values.push(req.body.firstName);
+    }
+
+    if (req.body.middleName !== undefined) {
+        fields.push('u_MiddleName = ?');
+        values.push(req.body.middleName);
+    }
+
+    if (req.body.lastName !== undefined) {
+        fields.push('u_LastName = ?');
+        values.push(req.body.lastName);
+    }
+
+    if (req.body.DOB !== undefined) {
+        fields.push('u_Dob = ?');
+        values.push(req.body.DOB);
+    }
+
+    if (fields.length === 0) {
+        return res.status(400).json({ message: "No fields to update" });
+    }
+
+    const query = `UPDATE users SET ${fields.join(', ')} WHERE u_ID = ?`;
+    values.push(id);
+
+    connection.execute(query, values, (error, results) => {
+        if (error) {
+            console.log(error);
+            return res.status(500).json({ message: "Server error", error });
+        }
+
+        return results.affectedRows > 0
+            ? res.json({ message: "Success" })
+            : res.json({ message: "User not found" });
+    })
+})
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`);
 });
