@@ -60,6 +60,23 @@ app.post('/auth/signup', (req, res, next) => {
         // }
     // })
 });
+//signin
+app.post('/auth/signin', (req, res, next) => {
+    const { email, password } = req.body;
+    const query = 'SELECT * FROM users WHERE u_Email = ? AND u_Password = ?';
+    connection.execute(query, [email, password], (error, results) => {
+        if (error) {
+            console.log(error);
+            res.status(500).json({message: "Error in the server" , error});
+        } else {
+            if(results.length > 0){
+                return res.json({message: "Success" , results});
+            }else{
+                return res.json({message: "User not found" });
+            }
+        }
+    })
+});
 
 app.get('/', (req, res) => {//we need to retrieve data from the database
     const query = 'SELECT * FROM users';
@@ -72,6 +89,21 @@ app.get('/', (req, res) => {//we need to retrieve data from the database
         }
     })
 });
+
+//we need to access the data of specific user by id taken from the front end in url parameter
+app.get('/users/:id/profile', (req, res) => {
+    const {id} = req.params; //thats a destructuring
+    console.log(id);
+    const query = 'SELECT * FROM users WHERE u_ID = ?';
+    connection.execute(query, [id], (error, results) => {
+        if (error) {
+            console.log(error);
+            res.status(500).json({message: "Error in the server" , error});
+        } else {
+            return results.length > 0 ? res.json({message: "Success" , results}) : res.json({message: "User not found" });
+        }
+    })
+})
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`);
 });
