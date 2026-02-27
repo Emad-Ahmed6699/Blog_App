@@ -149,6 +149,33 @@ app.patch('/users/:id/profile', (req, res) => {
             : res.json({ message: "User not found" });
     })
 })
+
+app.delete('/users/:id/profile', (req, res) => {
+    const {id} = req.params; 
+    const query = 'DELETE FROM users WHERE u_ID = ?';
+    connection.execute(query, [id], (error, results) => {
+        if (error) {
+            console.log(error);
+            res.status(500).json({message: "Error in the server" , error});
+        } else {
+            return results.affectedRows > 0 ? res.json({message: "deleted Success" , results}) : res.json({message: "User not found" });
+        }
+    })
+})
+
+//search
+app.get('/users/search', (req, res) => {
+    const {searchTerm} = req.query;
+    const query = 'SELECT * FROM users WHERE u_FirstName LIKE ? OR u_MiddleName LIKE ? OR u_LastName LIKE ?';
+    connection.execute(query, [`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`], (error, results) => {
+        if (error) {
+            console.log(error);
+            res.status(500).json({message: "Error in the server" , error});
+        } else {
+            return results.length > 0 ? res.json({message: "Success" , results}) : res.json({message: "User not found" });
+        }
+    })
+})
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`);
 });
