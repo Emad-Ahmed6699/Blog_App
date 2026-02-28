@@ -26,12 +26,6 @@ connection.connect((error)=>{
 //signup 
 app.post('/auth/signup', (req, res, next) => {
     const { fistName ,middleName , lastName , email, password,confirmPassword } = req.body;
-    //const query = 'INSERT INTO users (fistName, ,middleName , lastName , email, password ,confirmPassword) VALUES (?, ?, ? ,?, ?, ?, ?)';
-    // connection.execute(query, [fistName, middleName, lastName, email, password ,confirmPassword], (error, results) => {
-    //     if (error) {
-    //         console.log(error);
-    //         res.status(500).json({message: "Error in the server" , error});
-    //     } else {
             console.log({fistName, middleName, lastName, email, password ,confirmPassword});
             if(password !== confirmPassword){
                 return res.json({message: "Password does not match" });
@@ -43,7 +37,7 @@ app.post('/auth/signup', (req, res, next) => {
                     res.status(500).json({message: "Error in the server" , error});
                 } else {
                     if(results.length > 0){
-                        return res.json({message: "User already exists" });
+                        return res.json({message: "User alraedy exists" });
                     }
                 }
             })
@@ -176,6 +170,46 @@ app.get('/users/search', (req, res) => {
         }
     })
 })
+
+//bloog
+//insert
+app.post('/bloog', (req, res) => {
+    const {title, content,authorid} = req.body;
+    console.log({title, content,authorid});
+    const query = 'select * from users where u_id = ?';
+    connection.execute(query, [authorid], (error, results) => {
+        if (error) {
+            console.log(error);
+            res.status(500).json({message: "Error in the server" , error});
+        }
+         if(results.length) {
+            const insertBlogQuery = 'INSERT INTO bloogs (b_title, b_content, b_author_id) VALUES (?, ?, ?)';
+            connection.execute(insertBlogQuery, [title, content, authorid], (error, results) => {
+                if (error) {
+                    console.log(error);
+                    res.status(500).json({message: "Error in the server" , error});
+                } else {
+                    return res.json({message: "Success data" });
+                }
+            })
+        }
+        else{
+            return res.status(400).json({message: "User not found" });
+        }
+    })
+})
+//get all bloogs
+app.get('/bloogs', (req, res) => {
+    const query = 'SELECT * FROM bloogs';
+    connection.execute(query, (error, results) => {
+        if (error) {
+            console.log(error);
+            res.status(500).json({message: "Error in the server" , error});
+        } else {
+            res.json({message: "Success" , results});
+        }
+    })
+});
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`);
 });
