@@ -1,3 +1,5 @@
+/*
+
 //npm i mysql2
 const express = require('express');
 const mysql = require('mysql2');
@@ -213,3 +215,10 @@ app.get('/bloogs', (req, res) => {
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`);
 });
+
+
+
+*/
+
+import bootstrap from './app.controller.js';
+bootstrap();
